@@ -1,8 +1,15 @@
 import requests
 import re
+import utils
+import argparse
 
 from bs4 import BeautifulSoup
 import pandas as pd
+from datetime import datetime
+
+CURRENTMONTH= datetime.now().strftime('%m')
+CURRENTYEAR = datetime.now().year
+BASEURLADVISORY = "https://advisories.ncsc.nl/advisory?bare=1&format=undefined&id="
 
 def get_matrix_from_advisory_html(adv_html) :
     
@@ -67,7 +74,7 @@ def get_all_advisories(urls) :
                         list_adv_numbers.append(advisory_number)
                         advisory_version = (re.search(r'\[.*?\]', advisory))[0]
                         advisory_version_clean = advisory_version.replace("[", "").replace("]", "")
-                        advisoryURL = baseURLAdvisory + advisory_number
+                        advisoryURL = BASEURLADVISORY + advisory_number
                         page = requests.get(advisoryURL)
                         df_advisory_matrix=get_matrix_from_advisory_html(page.text)
                         df_advisory_matrix["Nummer"] = advisory_number
@@ -78,100 +85,34 @@ def get_all_advisories(urls) :
                         
         return df_all_advisories
 
-baseURLAdvisory = "https://advisories.ncsc.nl/advisory?bare=1&format=undefined&id="
-
-urlsMH2023 = [
-        "https://advisories.ncsc.nl/ajax/search?from=30-04-2023&to=31-05-2023&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=31-03-2023&to=30-04-2023&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-02-2023&to=31-03-2023&words=&prob[]=medium&dmg[]=high", 
-        "https://advisories.ncsc.nl/ajax/search?from=01-01-2023&to=01-02-2023&words=&prob[]=medium&dmg[]=high"]
-
-
-urlsMH2022 = [
-        "https://advisories.ncsc.nl/ajax/search?from=01-12-2022&to=01-01-2023&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-11-2022&to=01-12-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-10-2022&to=01-11-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-09-2022&to=01-10-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-08-2022&to=01-09-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-07-2022&to=01-08-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-06-2022&to=01-07-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-05-2022&to=01-06-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-04-2022&to=01-05-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-03-2022&to=01-04-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-02-2022&to=01-03-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-01-2022&to=01-02-2022&words=&prob[]=medium&dmg[]=high",
-        ]
-
-urlsMH2021 = [
-        "https://advisories.ncsc.nl/ajax/search?from=01-12-2021&to=01-01-2022&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-11-2021&to=01-12-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-10-2021&to=01-11-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-09-2021&to=01-10-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-08-2021&to=01-09-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-07-2021&to=01-08-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=15-06-2021&to=01-07-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-06-2021&to=15-06-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-05-2021&to=01-06-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=15-04-2021&to=01-05-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-04-2021&to=15-04-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-03-2021&to=01-04-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-02-2021&to=01-03-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-01-2021&to=01-02-2021&words=&prob[]=medium&dmg[]=high",
-        ]       
- 
-urlsMH2020 = [
-        "https://advisories.ncsc.nl/ajax/search?from=01-12-2020&to=01-01-2021&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-11-2020&to=01-12-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-10-2020&to=01-11-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-09-2020&to=01-10-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-08-2020&to=01-09-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-07-2020&to=01-08-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-06-2020&to=01-07-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-05-2020&to=01-06-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-04-2020&to=01-05-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-03-2020&to=01-04-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-02-2020&to=01-03-2020&words=&prob[]=medium&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-01-2020&to=01-02-2020&words=&prob[]=medium&dmg[]=high",
-        ]
-    
-urlsHH = [
-        "https://advisories.ncsc.nl/ajax/search?from=01-01-2023&to=31-03-2023&words=&prob[]=high&dmg[]=high", 
-        "https://advisories.ncsc.nl/ajax/search?from=01-10-2022&to=01-01-2023&words=&prob[]=high&dmg[]=high", 
-        "https://advisories.ncsc.nl/ajax/search?from=01-07-2022&to=01-10-2022&words=&prob[]=high&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-04-2022&to=01-07-2022&words=&prob[]=high&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-01-2022&to=01-04-2022&words=&prob[]=high&dmg[]=high",        
-        "https://advisories.ncsc.nl/ajax/search?from=01-10-2021&to=01-01-2022&words=&prob[]=high&dmg[]=high", 
-        "https://advisories.ncsc.nl/ajax/search?from=01-07-2021&to=01-10-2021&words=&prob[]=high&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-04-2021&to=01-07-2021&words=&prob[]=high&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-01-2021&to=01-04-2021&words=&prob[]=high&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-10-2020&to=01-01-2021&words=&prob[]=high&dmg[]=high", 
-        "https://advisories.ncsc.nl/ajax/search?from=01-07-2020&to=01-10-2020&words=&prob[]=high&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-04-2020&to=01-07-2020&words=&prob[]=high&dmg[]=high",
-        "https://advisories.ncsc.nl/ajax/search?from=01-01-2020&to=01-04-2020&words=&prob[]=high&dmg[]=high"]
- 
-urls1 = ["https://advisories.ncsc.nl/ajax/search?from=20-03-2023&to=31-03-2023&words=&prob[]=medium&dmg[]=high"]
-
-
-writer = pd.ExcelWriter("MHHH-2023.xlsx", engine='xlsxwriter')
-
-""" df_all_MH_advsories_2020 = get_all_advisories(urlsMH2020)
-print("Finished 2020")
-df_all_MH_advsories_2021 = get_all_advisories(urlsMH2021)
-print("Finished 2021")
-df_all_MH_advsories_2022 = get_all_advisories(urlsMH2022)
-print("Finished 2022") """
-df_all_MH_advsories_2023 = get_all_advisories(urlsMH2023)
-print("Finished 2023")
-
-df_all_MH_advsories_2023.to_excel(writer, sheet_name="MH2023", index=False)
-
-df_all_HH_advisories_2022_23 = get_all_advisories(urlsHH)
-print("Finished HHs")
-
-# df_all_MH_advsories_2020.to_excel(writer, sheet_name="MH2020", index=False)
-# df_all_MH_advsories_2021.to_excel(writer, sheet_name="MH2021", index=False)
-# df_all_MH_advsories_2022.to_excel(writer, sheet_name="MH2022", index=False)
-df_all_HH_advisories_2022_23.to_excel(writer, sheet_name="HH", index=False)
-
-writer.close()
+def createSheetAdvisoriesForMonth(prmExcelFilename, prmSheetName, prmMonth=None, prmYear=CURRENTYEAR, prmProb="medium", prmDmg="high"):
+        writer = pd.ExcelWriter(prmExcelFilename, engine='xlsxwriter')
+        URLs = []
+        if prmYear > CURRENTYEAR :
+               print("only current year or older (starting 2014)!")
+               return URLs
         
+        if prmMonth :
+                URLs = utils.createURLsForMonth(prmYear, int(prmMonth), prmProb, prmDmg)
+        else :
+                URLs = utils.createURLsForYear(prmYear, prmProb, prmDmg)
+        df_advisories = get_all_advisories(URLs)
+        df_advisories.to_excel(writer, prmSheetName, index=False)
+        writer.close()
+
+#little test code
+#createSheetAdvisoriesForMonth("mytestsheetMH.xlsx", "MHs")
+#createSheetAdvisoriesForMonth("mytestsheetHH.xlsx", "HHs", prmProb="high", prmDmg="high")
+
+parser = argparse.ArgumentParser("Get an Excelsheet with an overview of all the NCSC advisories for a certain period and a certain classification.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument("ExcelFilename", type=str)
+parser.add_argument("SheetName", type=str)
+parser.add_argument("--year", default=CURRENTYEAR, type=int, help="The year for which you want the overview")
+parser.add_argument("--month", default=None, type=int, help="The month (as an integer) for which you want the overview. If not provided you will the whole year.")
+parser.add_argument("--probability", default='medium', type=str, help="The probability classification for which you want the overview")
+parser.add_argument("--damage", default='high', type=str, help="The damage classification for which you want the overview")
+
+args=parser.parse_args()
+
+createSheetAdvisoriesForMonth(args.ExcelFilename, args.SheetName, args.month, args.year, args.probability, args.damage)
+
