@@ -105,7 +105,7 @@ def createSheetAdvisoriesForMonth(prmExcelFilename, prmSheetName, prmMonth=None,
 #createSheetAdvisoriesForMonth("mytestsheetHH.xlsx", "HHs", prmProb="high", prmDmg="high")
 
 parser = argparse.ArgumentParser("Get an Excelsheet with an overview of all the NCSC advisories for a certain period and a certain classification.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("ExcelFilename", type=str)
+parser.add_argument("ExcelFilename", type=str, help="The name of the Excelsheet to be created. Should have the '.xls(x)' extension. Existing file will be overwritten!")
 parser.add_argument("SheetName", type=str)
 parser.add_argument("--year", default=CURRENTYEAR, type=int, help="The year for which you want the overview")
 parser.add_argument("--month", default=None, type=int, help="The month (as an integer) for which you want the overview. If not provided you will the whole year.")
