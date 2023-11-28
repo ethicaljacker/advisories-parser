@@ -55,7 +55,7 @@ def get_matrix_from_advisory_html(adv_html) :
     matrix = pd.DataFrame(data, columns=matrix_names)
     return matrix
 
-def get_all_advisories(urls) :
+def get_all_advisories_for_urls(urls) :
         list_advisories = []
         list_adv_numbers = []
 
@@ -85,8 +85,7 @@ def get_all_advisories(urls) :
                         
         return df_all_advisories
 
-def createSheetAdvisoriesForMonth(prmExcelFilename, prmSheetName, prmMonth=None, prmYear=CURRENTYEAR, prmProb="medium", prmDmg="high"):
-        writer = pd.ExcelWriter(prmExcelFilename, engine='xlsxwriter')
+def get_all_advisories(prmMonth=None, prmYear=CURRENTYEAR, prmProb="medium", prmDmg="high") :
         URLs = []
         if prmYear > CURRENTYEAR :
                print("only current year or older (starting 2014)!")
@@ -96,17 +95,26 @@ def createSheetAdvisoriesForMonth(prmExcelFilename, prmSheetName, prmMonth=None,
                 URLs = utils.createURLsForMonth(prmYear, int(prmMonth), prmProb, prmDmg)
         else :
                 URLs = utils.createURLsForYear(prmYear, prmProb, prmDmg)
-        df_advisories = get_all_advisories(URLs)
+        
+        return get_all_advisories_for_urls(URLs)
+
+def createSheetAdvisoriesForMonth(prmExcelFilename, prmSheetName, prmMonth=None, prmYear=CURRENTYEAR, prmProb="medium", prmDmg="high"):
+        writer = pd.ExcelWriter(prmExcelFilename, engine='xlsxwriter')
+        df_advisories = get_all_advisories(prmMonth, prmYear, prmProb, prmDmg)
         df_advisories.to_excel(writer, prmSheetName, index=False)
         writer.close()
+        return "%s successfull created." % (prmExcelFilename)
+
+def getCSVText_all_advisories(prmMonth=None, prmYear=CURRENTYEAR, prmProb="medium", prmDmg="high"):
+        return(get_all_advisories(prmMonth, prmYear, prmProb, prmDmg).to_csv())
 
 #little test code
 #createSheetAdvisoriesForMonth("mytestsheetMH.xlsx", "MHs")
 #createSheetAdvisoriesForMonth("mytestsheetHH.xlsx", "HHs", prmProb="high", prmDmg="high")
 
 parser = argparse.ArgumentParser("Get an Excelsheet with an overview of all the NCSC advisories for a certain period and a certain classification.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("ExcelFilename", type=str, help="The name of the Excelsheet to be created. Should have the '.xls(x)' extension. Existing file will be overwritten!")
-parser.add_argument("SheetName", type=str)
+parser.add_argument("--filename", default=None, type=str, help="The name of the Excelsheet to be created. Should have the '.xls(x)' extension. Existing file will be overwritten! If omitted a comma separated text string will be returned.")
+parser.add_argument("--sheetname", default="wks1", type=str)
 parser.add_argument("--year", default=CURRENTYEAR, type=int, help="The year for which you want the overview")
 parser.add_argument("--month", default=None, type=int, help="The month (as an integer) for which you want the overview. If not provided you will the whole year.")
 parser.add_argument("--probability", default='medium', type=str, help="The probability classification for which you want the overview")
@@ -114,5 +122,7 @@ parser.add_argument("--damage", default='high', type=str, help="The damage class
 
 args=parser.parse_args()
 
-createSheetAdvisoriesForMonth(args.ExcelFilename, args.SheetName, args.month, args.year, args.probability, args.damage)
-
+if (args.filename) :
+        print(createSheetAdvisoriesForMonth(args.filename, args.sheetname, args.month, args.year, args.probability, args.damage))
+else :
+        print(getCSVText_all_advisories(prmMonth=args.month, prmYear=args.year, prmProb=args.probability, prmDmg=args.damage))
