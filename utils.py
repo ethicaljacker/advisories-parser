@@ -13,7 +13,9 @@ def createURLsForMonth(year, iMonth, prob, dmg) :
     
     startdate2 = "15-%s-%s" % (f"{iMonth:02d}",year)
     nextmonth = iMonth+1
-    if iMonth==12 : nextmonth = 1
+    if iMonth==12 : 
+        nextmonth = 1
+        year = year+1
     endate2 = "01-%s-%s" % (f"{nextmonth:02d}",year)
     
     url1 = BASEURLSTR % (startdate1, endate1, prob, dmg) 
