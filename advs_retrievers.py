@@ -34,22 +34,22 @@ def get_matrix_from_advisory_html(adv_html) :
             publish_date = date_element.text.strip()
                 
     prop_matrix = soup.find(id="probability_matrix")
+    
     matrix_names = ["Advisory naam", "Kans", "Schade", "Datum eerste publicatie"]
     matrix_values = [adv_name, kans, schade, publish_date]
-    
-    tr_matrix_elements = prop_matrix.find_all("tr")
-    for matrix_element in tr_matrix_elements :
-        matrix_element_name = matrix_element["id"]
-        matrix_element_value = matrix_element.find("td", class_="matrix_weight")
-        matrix_names.append(matrix_element_name)
-        matrix_value = matrix_element_value.text.strip()
-        if matrix_element_name == "probability_total" :
-            matrix_value = matrix_value.replace("∑\xa0=\xa0", "")
-        
-        matrix_values.append(matrix_value)
-
-
-            
+     
+    if prop_matrix is not None:
+        tr_matrix_elements = prop_matrix.find_all("tr")
+        for matrix_element in tr_matrix_elements :
+            matrix_element_name = matrix_element["id"]
+            matrix_element_value = matrix_element.find("td", class_="matrix_weight")
+            matrix_names.append(matrix_element_name)
+            matrix_value = matrix_element_value.text.strip()
+            if matrix_element_name == "probability_total" :
+                matrix_value = matrix_value.replace("∑\xa0=\xa0", "")
+            matrix_values.append(matrix_value)
+    else:
+        print("No matrix values found for ", adv_name)
     data=[]
     data.append(matrix_values)
     matrix = pd.DataFrame(data, columns=matrix_names)
